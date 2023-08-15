@@ -5,6 +5,7 @@ services:
     volumes:
       - <path to solution>/symfony:/var/www/symfony/
       - <path to solution>/symfony/data:/var/www/symfony/data
+      - <path to solution>/logs/symfony:/var/www/symfony/var/log
     environment:
       APP_ENV: prod
       XDEBUG_CONFIG: remote_host=host.docker.internal remote_port=9003 remote_connect_back=0
