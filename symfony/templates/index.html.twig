@@ -1,0 +1,163 @@
+{% extends 'base.html.twig' %}
+{% block title %}STFC{% endblock %}
+
+{% block javascripts %}
+<script>
+    let data = {{ data|json_encode|raw }};
+
+    function loadWeeks(){
+        let currentWeek = {{ week_number }};
+        let week = $('#week');
+        for (let i = 0; i <= 53; i++) {
+            let selected = (i === currentWeek) ? ' selected': '';
+            week.append($('<option value="' + i + '"' + selected + '>' + i + '</option>'));
+        }
+
+    }
+
+    function ISO8601_week_no(dt) {
+        var tdt = new Date(dt.valueOf());
+        var dayn = (dt.getDay() + 6) % 7;
+        tdt.setDate(tdt.getDate() - dayn + 3);
+        var firstThursday = tdt.valueOf();
+        tdt.setMonth(0, 1);
+        if (tdt.getDay() !== 4)
+        {
+            tdt.setMonth(0, 1 + ((4 - tdt.getDay()) + 7) % 7);
+        }
+        return 1 + Math.ceil((firstThursday - tdt) / 604800000);
+    }
+
+    function updateSelect(){
+        let server = $('#server').val();
+        let alliances = $('#alliance');
+        alliances.empty();
+        $.each(data[server]['Alliances'], function(index, item){
+            alliances.append($('<option value="' + item['Alliance'] + '">' + item['Alliance'] + '</option>'));
+        });
+    }
+
+    function createCopySource(response) {
+        let text = '';
+        text += '## Server ' + response.server + ':' + response.server_name + '\n';
+        text += '### [' + response.alliance.name + '] Territory Defense Schedule for Week #' + response.week_number + '\n';
+        $.each(response.alliance.territories, function(index, territory){
+            text += '* **' + territory.name + '** (' + formatTerritoryLevel(territory.level) + ') at <t:' + territory.time + ':F> ' + territory.duration + ' minute duration\n';
+        });
+        text += '_All times are displayed in your local timezone_'
+        return text;
+    }
+
+    function formatTerritoryLevel(level) {
+        return '\\' + level.split("").join('\\');
+    }
+
+    $(document).ready(function(){
+        loadWeeks();
+        updateSelect();
+        $('#server').on('change', function(e){updateSelect();});
+        $('#show').on('click', function(){
+            $.ajax({
+                url: 'api/territory/' + [$('#server').val(),$('#alliance').val(),$('#week').val()].join('/'),
+            }).done(function(response){
+                console.log(response);
+                $('#server_number').text(response.server);
+                $('#server_name').text(response.server_name);
+                $('.alliance_name').text(response.alliance.name);
+                $('#week_number').text(response.week_number);
+                let terriroies = $('#territories');
+                terriroies.empty();
+                $.each(response.alliance.territories, function(index, territory){
+                    let time = new Date(territory.time * 1000);
+                    terriroies.append($([
+                        '<tr>',
+                        '<td class="font-weight-bold">' + territory.name + '(' + territory.level + ')' + '</td>',
+                        '<td>' + time.toLocaleDateString() + ' ' + time.toLocaleTimeString() + '</td>',
+                        '<td>' + territory.duration + ' minute duration</td>',
+                        '</tr>'
+                    ].join('\r\n')));
+                });
+                $('#alliance_display').show();
+                $('#waiting').hide();
+                $('#copy_source').text(createCopySource(response));
+            });
+            //window.location = "{{ path('app_index') }}" + "/territory/" + $('#server').val() + '/' + $('#alliance').val();
+        });
+        $('#copy_button').on('click', function() {
+            let text = $('#copy_source').text().trim();
+            navigator.clipboard.writeText(text);
+        });
+
+    });
+</script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <h3>Star Trek Fleet Command</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="server_select">Server</span>
+                <select class="form-select" name="server" id="server" aria-describedby="server_select">
+                    {% for key, value in data %}<option value="{{ key }}">{{ key }}</option>{% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="week_select">Week</span>
+                <select class="form-select" id="week" name="week" aria-describedby="week_select"></select>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="alliance_select">Alliance</span>
+                <select class="form-select" id="alliance" name="alliance" aria-describedby="alliance_select"></select>
+            </div>
+            <button class="btn btn-outline-primary" id="show">Show Territory</button>
+        </div>
+    </div>
+    <div class="row" style="display:none;">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Territory Notice</h5>
+                    <div class="h4">Discord Territory post for <span id="alliance_name"></span></div>
+                    <button class="btn btn-outline-primary" id="copy">Copy</button>
+                    <div class="card-body">
+                        <pre class="p-3 rounded bg-dark text-light" id='discord'></pre></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="display:none;" id="alliance_display">
+        <div class="col">
+            <div class="card text-white bg-primary">
+                <div class="card-header text-center">
+                    <span class='alliance_name'></span> Alliance Territory
+                </div>
+                <div class="card-body bg-dark">
+                    <h3>Server <span id='server_number'></span>:<span id='server_name'></span></h3>
+                    <h5>[<span class='alliance_name'></span>] Territory Defense Schedule for Week #<span id='week_number'></span></h5>
+                    <table class="table table-sm text-light" id='territories'></table>
+                    <p class='fst-italic'>All times are displayed in your local timezone</p>
+                    <button class="btn btn-secondary btn-lg" id="copy_button">Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <pre class="bg-dark text-light" id="copy_source"></pre>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,7 @@
+server_number:
+    name: 'server_name'
+    Alliances:
+      0:
+        Alliance: 'alliance_name'
+        Status: number
+        Territories: [ 'comma_separated_list_of_terriory_names' ]
