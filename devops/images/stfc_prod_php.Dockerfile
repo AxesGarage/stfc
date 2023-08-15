@@ -42,6 +42,6 @@ COPY symfony /var/www/symfony
 WORKDIR /var/www/symfony/
 RUN rm -rf var/ vendor/
 
-RUN composer install --no-progress --optimize-autoloader
+RUN composer install --no-progress
 
 RUN php ./bin/console cache:clear -e prod && php ./bin/console cache:warm -e prod
