@@ -3,8 +3,8 @@ version: "3.7"
 services:
   php:
     build:
-      context: ../images
-      dockerfile: stfc_dev_php.Dockerfile
+      context: ../../
+      dockerfile: devops/images/stfc_dev_php.Dockerfile
 
   nginx:
     build:

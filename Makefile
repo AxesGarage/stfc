@@ -10,3 +10,7 @@ docker_bash:
 docker_down:
 	@echo "Stopping Docker"
 	@(cd devops/stfc_dev && docker-compose down)
+
+docker_build:
+	@echo "Building Production Container"
+	@docker build -f devops/images/stfc_prod_php.Dockerfile -t stfc_prod:latest .
