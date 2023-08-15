@@ -81,7 +81,7 @@
                 $('#waiting').hide();
                 $('#copy_source').text(createCopySource(response));
             });
-            //window.location = "{{ path('app_index') }}" + "/territory/" + $('#server').val() + '/' + $('#alliance').val();
+            //window.location = "{{ path('app_stfc_index') }}" + "/territory/" + $('#server').val() + '/' + $('#alliance').val();
         });
         $('#copy_button').on('click', function() {
             let text = $('#copy_source').text().trim();

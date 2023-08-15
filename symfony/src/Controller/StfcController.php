@@ -13,15 +13,15 @@ use Symfony\Component\Yaml\Yaml;
 
 class StfcController extends AbstractController {
 
-    #[Route('/', name: 'app_index')]
+    #[Route('/stfc/', name: 'app_stfc_index')]
     public function index(KernelInterface $kernel): Response {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
-        return $this->render('index.html.twig', [
+        return $this->render('stfc/index.html.twig', [
             'data' => $stfc_data,
             'week_number' => (new \DateTime())->format('W')
         ]);
     }
-    #[Route('/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
+    #[Route('/stfc/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
     public function territoryApiRedirect(int $server, string $alliance): RedirectResponse {
         return $this->redirectToRoute('app_territory_api',[
             'server' => $server,
@@ -30,7 +30,7 @@ class StfcController extends AbstractController {
         ]);
     }
 
-    #[Route('/api/territory/{server}/{alliance}/{week}', name: 'app_territory_api')]
+    #[Route('/stfc/api/territory/{server}/{alliance}/{week}', name: 'app_territory_api')]
     public function territoryApi(int $server, string $alliance, int $week, KernelInterface $kernel): JsonResponse {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
 
