@@ -11,6 +11,7 @@ services:
 
   nginx:
     volumes:
+      - <path to solution>/symfony:/var/www/symfony
       - <path to solution>/devops/images/nginx/nginx.conf:/etc/nginx/nginx.conf
       - <path to solution>/devops/images/nginx/sites/:/etc/nginx/sites-available
       - <path to solution>/devops/images/nginx/conf.d/:/etc/nginx/conf.d
