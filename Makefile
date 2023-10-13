@@ -32,7 +32,8 @@ docker-dev-down:
 #
 docker-prod-build:
 	@echo "Building Production Container"
-	@docker build -f devops/images/stfc_prod_php.Dockerfile -t stfc_prod:latest .
+	@docker build -f devops/images/stfc_prod_php.Dockerfile -t stfc-prod-php:latest .
+	@docker build -f devops/images/stfc_prod_nginx.Dockerfile -t stfc-prod-nginx:latest .
 
 #
 # Bring up the production docker containers
