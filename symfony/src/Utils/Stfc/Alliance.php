@@ -14,6 +14,7 @@ class Alliance {
         foreach ($territories as $territory) {
             $this->addTerritory($territory, $week);
         }
+        $this->territories = $this->getTerritories();
     }
 
     public function addTerritory($name, $week = null):void {

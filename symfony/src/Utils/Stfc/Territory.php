@@ -13,6 +13,8 @@ class Territory {
     private $time;
     private $duration;
 
+    private $particle;
+
     private function __construct(){}
 
     public static function create($name, $week = null): self {
@@ -22,6 +24,7 @@ class Territory {
         $self->level = Data::getLevel($name);
         $self->duration = Data::defenseTime($self->level);
         $self->time = self::getDefenseTime($self->capture, $week);
+        $self->particle = Data::getParticle($name);
         return $self;
     }
 
@@ -82,5 +85,9 @@ class Territory {
      */
     public function getDuration() {
         return $this->duration;
+    }
+
+    public function getParticle() {
+        return $this->particle;
     }
 }

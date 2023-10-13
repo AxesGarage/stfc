@@ -71,7 +71,7 @@
                     let time = new Date(territory.time * 1000);
                     terriroies.append($([
                         '<tr>',
-                        '<td class="font-weight-bold">' + territory.name + '(' + territory.level + ')' + '</td>',
+                        '<td class="font-weight-bold">' + territory.name + '(' + territory.level + ') ' + territory.particle + '</td>',
                         '<td>' + time.toLocaleDateString() + ' ' + time.toLocaleTimeString() + '</td>',
                         '<td>' + territory.duration + ' minute duration</td>',
                         '</tr>'
