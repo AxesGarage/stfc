@@ -2,13 +2,11 @@ version: "3.7"
 
 services:
   php:
-    image: stfc_prod:latest
+    image: stfc-prod-php:latest
     restart: always
 
   nginx:
-    build:
-      context: ../images
-      dockerfile: nginx.Dockerfile
+    image: stfc-prod-nginx:latest
     restart: always
     depends_on:
       - php
