@@ -55,12 +55,11 @@
     $(document).ready(function(){
         loadWeeks();
         updateSelect();
-        $('#server').on('change', function(e){updateSelect();});
+        $('#server').on('change', function(){updateSelect();});
         $('#show').on('click', function(){
             $.ajax({
                 url: 'api/territory/' + [$('#server').val(),$('#alliance').val(),$('#week').val()].join('/'),
             }).done(function(response){
-                console.log(response);
                 $('#server_number').text(response.server);
                 $('#server_name').text(response.server_name);
                 $('.alliance_name').text(response.alliance.name);
@@ -81,12 +80,17 @@
                 $('#waiting').hide();
                 $('#copy_source').text(createCopySource(response));
             });
-            //window.location = "{{ path('app_stfc_index') }}" + "/territory/" + $('#server').val() + '/' + $('#alliance').val();
         });
-        $('#copy_button').on('click', function() {
-            let text = $('#copy_source').text().trim();
-            navigator.clipboard.writeText(text);
-        });
+        const copy_button = document.getElementById('copy_button');
+        const copy_source = document.getElementById('copy_source');
+        copy_button.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(copy_source.textContent);
+                alert("Successfully copied");
+            } catch (e) {
+                alert(e);
+            }
+        }
 
     });
 </script>
@@ -154,7 +158,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row" style="display:none;">
         <div class="col">
             <pre class="bg-dark text-light" id="copy_source"></pre>
         </div>
