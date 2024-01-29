@@ -6,11 +6,11 @@ class Alliance {
 
     private $name = null;
     private array $territories = [];
-    private ?string $status = null;
+    private int $status = Status::ALLIANCE_STATUS_NEUTRAL;
 
     public function __construct($name, $status = Status::ALLIANCE_STATUS_NEUTRAL, $territories = [], $week = null) {
         $this->name = $name;
-        $this->status = Status::getStatus($status);
+        $this->status = $status;
         foreach ($territories as $territory) {
             $this->addTerritory($territory, $week);
         }
@@ -28,6 +28,15 @@ class Alliance {
         return $return;
     }
 
+    public function isAlly(): bool {
+        return in_array($this->status,
+            [
+                Status::ALLIANCE_STATUS_ALLIED,
+                Status::ALLIANCE_STATUS_FRIENDLY,
+                Status::ALLIANCE_STATUS_CIVIL
+            ]);
+    }
+
     /**
      * @return null
      */
@@ -39,7 +48,7 @@ class Alliance {
      * @return string
      */
     public function getStatus(): string {
-        return $this->status;
+        return Status::getStatus($this->status);
     }
 
 }

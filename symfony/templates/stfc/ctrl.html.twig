@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+{% block title %}STFC{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('.time_format').each(function(i){
+                let time = new Date($(this).data('time') * 1000);
+                $(this).text(time.toLocaleDateString() + ' ' + time.toLocaleTimeString())
+            });
+        })
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col">
+            <h3>Star Trek Fleet Command</h3>
+        </div>
+    </div>
+
+    <div class="row" id="alliance_display">
+        <div class="col">
+            <div class="card text-white bg-primary">
+                <div class="card-header text-center">
+                    <span class='alliance_name'></span> Alliance Territory
+                </div>
+                <div class="card-body bg-dark">
+                    <h3>Server 63:Tomalak</h3>
+                    <h5>[CTRL] Territory Defense Schedule for Week #{{ week_number }}</h5>
+                    <table class="table table-sm text-light" id='territories'>
+                        {% for territory in alliance.territories %}
+                            <tr>
+                                <td class="font-weight-bold">{{ territory.name }} ({{ territory.level }})</td>
+                                <td class="time_format" data-time="{{ territory.time }}"></td>
+                                <td>{{ territory.duration }} minute duration</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <p class='fst-italic'>All times are displayed in your local timezone</p>
+                    {% if allies is not null %}
+                        <h5>Allies Defense Schedule</h5>
+                        {% for ally in allies %}
+                        <table class="table table-sm text-light">
+                            {% for territory in ally.territories %}
+                            <tr>
+                                <td>{{ ally.name }}</td>
+                                <td class="font-weight-bold">{{ territory.name }} ({{ territory.level }})</td>
+                                <td class="time_format" data-time="{{ territory.time }}"></td>
+                                <td>{{ territory.duration }} minute duration</td>
+                            </tr>
+                            {% endfor %}
+                        </table>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col">
+            <pre class="bg-dark text-light" id="copy_source">
+### [CTRL] Territory Defense Schedule for Week #{{ week_number }}
+{% for territory in alliance.territories %}
+* **{{ territory.name}}** ({{ territory.level }}) at &lt;t:{{ territory.time }}:F&gt; {{ territory.duration }} minute duration
+{% endfor %}
+### ALLY Territory Schedule (for Territory Capture Season Pass Points ONLY)\*
+{% for territory in allyTerritories %}
+* _{{ territory.name }}_:**{{ territory.territory.name}}** ({{ territory.territory.level }}) at &lt;t:{{ territory.territory.time }}:F&gt; {{ territory.territory.duration }} minute duration
+{% endfor %}
+_All times are displayed in your local timezone_
+\* Please refer to the guide in #this-channel for additionl information
+            </pre>
+        </div>
+    </div>
+
+{% endblock %}
