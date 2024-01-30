@@ -38,20 +38,18 @@
                         {% endfor %}
                     </table>
                     <p class='fst-italic'>All times are displayed in your local timezone</p>
-                    {% if allies is not null %}
+                    {% if allyTerritories is not empty %}
                         <h5>Allies Defense Schedule</h5>
-                        {% for ally in allies %}
                         <table class="table table-sm text-light">
-                            {% for territory in ally.territories %}
+                            {% for territory in allyTerritories %}
                             <tr>
-                                <td>{{ ally.name }}</td>
-                                <td class="font-weight-bold">{{ territory.name }} ({{ territory.level }})</td>
-                                <td class="time_format" data-time="{{ territory.time }}"></td>
-                                <td>{{ territory.duration }} minute duration</td>
+                                <td>{{ territory.name }}</td>
+                                <td class="font-weight-bold">{{ territory.territory.name }} ({{ territory.territory.level }})</td>
+                                <td class="time_format" data-time="{{ territory.territory.time }}"></td>
+                                <td>{{ territory.territory.duration }} minute duration</td>
                             </tr>
                             {% endfor %}
                         </table>
-                        {% endfor %}
                     {% endif %}
                 </div>
             </div>
@@ -65,12 +63,19 @@
 {% for territory in alliance.territories %}
 * **{{ territory.name}}** ({{ territory.level }}) at &lt;t:{{ territory.time }}:F&gt; {{ territory.duration }} minute duration
 {% endfor %}
-### ALLY Territory Schedule (for Territory Capture Season Pass Points ONLY)\*
+
+### Neighbor Territory Schedule (for Territory Capture Season Pass Points ONLY)\*
 {% for territory in allyTerritories %}
 * _{{ territory.name }}_:**{{ territory.territory.name}}** ({{ territory.territory.level }}) at &lt;t:{{ territory.territory.time }}:F&gt; {{ territory.territory.duration }} minute duration
 {% endfor %}
 _All times are displayed in your local timezone_
-\* Please refer to the guide in #this-channel for additionl information
+\* These neighbors have offered to allow us to join there territory defenses to acquire points for our Territory event
+* We have to join the Territory Capture to acquire points
+* If you do NOT need points, please do not attend
+* Please bring the smallest ships you can, preferably mining ships
+* Please keep your ships at the outer boarder of the territory
+* If possible please keep your ship in a quadrant that does NOT have an entry route into the system
+* If the territory becomes contested, please vacate immediately
             </pre>
         </div>
     </div>

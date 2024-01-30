@@ -4,9 +4,9 @@ namespace App\Utils\Stfc;
 
 class Alliance {
 
-    private $name = null;
+    private $name;
     private array $territories = [];
-    private int $status = Status::ALLIANCE_STATUS_NEUTRAL;
+    private int $status;
 
     public function __construct($name, $status = Status::ALLIANCE_STATUS_NEUTRAL, $territories = [], $week = null) {
         $this->name = $name;
@@ -28,6 +28,9 @@ class Alliance {
         return $return;
     }
 
+    /**
+     * @return bool
+     */
     public function isAlly(): bool {
         return in_array($this->status,
             [
@@ -49,6 +52,13 @@ class Alliance {
      */
     public function getStatus(): string {
         return Status::getStatus($this->status);
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusId(): int {
+        return $this->status;
     }
 
 }
