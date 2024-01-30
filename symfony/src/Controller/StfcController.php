@@ -36,17 +36,19 @@ class StfcController extends AbstractController {
             $result[$data['Alliance']] = new Alliance($data['Alliance'], $status, $territories);
             return $result;
         }, []);
-
-
+        $alliance = $alliances['CTRL'];
+        $connectedTerritories = $alliance->getConnectedTerritories();
         $allyAlliances = array_filter($alliances, function($alliance){ return $alliance->isAlly(); });
 
         $allyTerritories = [];
         foreach ($allyAlliances as $ally){
             foreach($ally->getTerritories() as $territory) {
-                $allyTerritories[] = [
-                    'name' => $ally->getName(),
-                    'territory' => $territory
-                ];
+                if(in_array($territory->getName(), $connectedTerritories)) {
+                    $allyTerritories[] = [
+                        'name' => $ally->getName(),
+                        'territory' => $territory
+                    ];
+                }
             }
         }
 
@@ -56,7 +58,7 @@ class StfcController extends AbstractController {
 
         return $this->render('stfc/ctrl.html.twig', [
             'data' => $stfc_data,
-            'alliance' => $alliances['CTRL'],
+            'alliance' => $alliance,
             'allies' => $allyAlliances,
             'allyTerritories' => $allyTerritories,
             'week_number' => (new \DateTime())->format('W')
@@ -98,7 +100,44 @@ class StfcController extends AbstractController {
             'server_name' => $server_data['name'],
             'server' => $server,
             'alliance' => $alliances[$alliance],
+            'neighbors' => $this->getNeighbors($alliances[$alliance], $alliances),
             'week_number' => $week
         ]);
+    }
+
+    /**
+     * @param Alliance      $alliance
+     * @param Alliance[]    $allianceData
+     *
+     * @return array
+     */
+    protected function getNeighbors(Alliance $alliance, array $allianceData): array {
+        $result = [];
+        foreach($alliance->getTerritories() as $territory){
+            $result[$territory->getName()] = [];
+            $neighbors = $territory->getNeighbors();
+            foreach($neighbors as $neighbor){
+                $result[$territory->getName()][$neighbor] = [
+                    'territory' => Territory::create($neighbor),
+                    'owner' => $this->findOwner($neighbor, $allianceData)
+                ];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param string      $territoryName
+     * @param Alliance[]  $allianceData
+     *
+     * @return null|string
+     */
+    protected function findOwner(string $territoryName, array $allianceData): ?string {
+        foreach ($allianceData as $alliance) {
+            foreach ($alliance->getTerritories() as $territory) {
+                if($territoryName === $territory->getName()) return $alliance->getName();
+            }
+        }
+        return null;
     }
 }

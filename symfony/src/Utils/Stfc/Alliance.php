@@ -16,10 +16,13 @@ class Alliance {
         }
     }
 
-    public function addTerritory($name, $week = null):void {
+    public function addTerritory($name, $week = null): void {
         $this->territories[] = Territory::create($name, $week);
     }
 
+    /**
+     * @return Territory[]
+     */
     public function getTerritories(): array {
         $return = $this->territories;
         uasort($return, function (Territory $a, Territory $b) {
@@ -59,6 +62,17 @@ class Alliance {
      */
     public function getStatusId(): int {
         return $this->status;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getConnectedTerritories(): array {
+        $results = [];
+        foreach ($this->getTerritories() as $territory) {
+            $results = array_merge($territory->getNeighbors());
+        }
+        return array_values(array_unique($results));
     }
 
 }
