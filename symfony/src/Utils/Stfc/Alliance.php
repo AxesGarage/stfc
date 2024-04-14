@@ -4,28 +4,43 @@ namespace App\Utils\Stfc;
 
 class Alliance {
 
-    private $name = null;
+    private $name;
     private array $territories = [];
-    private ?string $status = null;
+    private int $status;
 
     public function __construct($name, $status = Status::ALLIANCE_STATUS_NEUTRAL, $territories = [], $week = null) {
         $this->name = $name;
-        $this->status = Status::getStatus($status);
+        $this->status = $status;
         foreach ($territories as $territory) {
             $this->addTerritory($territory, $week);
         }
     }
 
-    public function addTerritory($name, $week = null):void {
+    public function addTerritory($name, $week = null): void {
         $this->territories[] = Territory::create($name, $week);
     }
 
+    /**
+     * @return Territory[]
+     */
     public function getTerritories(): array {
         $return = $this->territories;
         uasort($return, function (Territory $a, Territory $b) {
             return ($a->getTime() < $b->getTime()) ? -1 : 1;
         });
         return $return;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAlly(): bool {
+        return in_array($this->status,
+            [
+                Status::ALLIANCE_STATUS_ALLIED,
+                Status::ALLIANCE_STATUS_FRIENDLY,
+                Status::ALLIANCE_STATUS_CIVIL
+            ]);
     }
 
     /**
@@ -39,7 +54,25 @@ class Alliance {
      * @return string
      */
     public function getStatus(): string {
+        return Status::getStatus($this->status);
+    }
+
+    /**
+     * @return int
+     */
+    public function getStatusId(): int {
         return $this->status;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getConnectedTerritories(): array {
+        $results = [];
+        foreach ($this->getTerritories() as $territory) {
+            $results = array_merge($territory->getNeighbors());
+        }
+        return array_values(array_unique($results));
     }
 
 }

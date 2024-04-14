@@ -77,20 +77,21 @@
                     ].join('\r\n')));
                 });
                 $('#alliance_display').show();
+                $('#copy_source_container').show();
                 $('#waiting').hide();
-                $('#copy_source').text(createCopySource(response));
+                $('#copy_source').text(createCopySource(response)).parent().parent().parent().show();
             });
         });
-        const copy_button = document.getElementById('copy_button');
-        const copy_source = document.getElementById('copy_source');
-        copy_button.onclick = async () => {
-            try {
-                await navigator.clipboard.writeText(copy_source.textContent);
-                alert("Successfully copied");
-            } catch (e) {
-                alert(e);
-            }
-        }
+        // const copy_button = document.getElementById('copy_button');
+        // const copy_source = document.getElementById('copy_source');
+        // copy_button.onclick = async () => {
+        //     try {
+        //         await navigator.clipboard.writeText(copy_source.textContent);
+        //         alert("Successfully copied");
+        //     } catch (e) {
+        //         alert(e);
+        //     }
+        // }
 
     });
 </script>
@@ -153,14 +154,19 @@
                     <h5>[<span class='alliance_name'></span>] Territory Defense Schedule for Week #<span id='week_number'></span></h5>
                     <table class="table table-sm text-light" id='territories'></table>
                     <p class='fst-italic'>All times are displayed in your local timezone</p>
-                    <button class="btn btn-secondary btn-lg" id="copy_button">Copy to Clipboard</button>
+{#                    <button class="btn btn-secondary btn-lg" id="copy_button">Copy to Clipboard</button>#}
                 </div>
             </div>
         </div>
     </div>
-    <div class="row" style="display:none;">
-        <div class="col">
-            <pre class="bg-dark text-light" id="copy_source"></pre>
+    <div class="row" style="display:none;" id="copy_source_container">
+        <div class="row">
+            <div class="col"><h3>Discord Format</h3></div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <pre class="bg-dark text-light" id="copy_source"></pre>
+            </div>
         </div>
     </div>
 
