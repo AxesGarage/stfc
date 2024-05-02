@@ -2,6 +2,18 @@
 {% block title %}STFC{% endblock %}
 
 {% block javascripts %}
+    <style>
+        pre.copy_source button.copy-button {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: .65rem !important;
+        }
+
+        .fs-7 {
+            font-size: 0.8rem !important;
+        }
+    </style>
     <script>
         $(document).ready(function(){
             $('.time_format').each(function(i){
@@ -9,25 +21,60 @@
                 $(this).text(time.toLocaleDateString() + ' ' + time.toLocaleTimeString())
             });
         })
+
+        const copyButtonLabel = "Copy";
+
+        $( document ).ready(function() {
+            // use a class selector if available
+            let blocks = document.querySelectorAll("pre.copy_source");
+
+            blocks.forEach((block) => {
+                // only add button if browser supports Clipboard API
+                if (navigator.clipboard) {
+                    let button = document.createElement("button");
+
+                    button.innerText = copyButtonLabel;
+                    button.setAttribute('class', 'copy-button btn btn-sm btn-primary');
+                    button.setAttribute('title','Copy to clipboard');
+                    block.appendChild(button);
+
+                    button.addEventListener("click", async () => {
+                        await copyCode(block);
+                    });
+                }
+            });
+
+        });
+        async function copyCode(block) {
+            let code = block.querySelector("code");
+            let text = code.innerText;
+
+            await navigator.clipboard.writeText(text);
+        }
     </script>
 {% endblock %}
 
 {% block body %}
-    <div class="row">
+    <div class="row mb-3">
         <div class="col">
             <h3>Star Trek Fleet Command</h3>
         </div>
     </div>
 
+    <div class="row mb-3">
+        <div class="col">
+            <a class="btn btn-primary" href="{{ path('stfc_index') }}">Return to Alliance List</a>
+        </div>
+    </div>
     <div class="row" id="alliance_display">
         <div class="col">
             <div class="card text-white bg-primary">
                 <div class="card-header text-center">
-                    <span class='alliance_name'></span> Alliance Territory
+                    <span class='alliance_name'></span>{{ alliance.name }} Alliance Territory
                 </div>
                 <div class="card-body bg-dark">
-                    <h3>Server 63:Tomalak</h3>
-                    <h5>[CTRL] Territory Defense Schedule for Week #{{ week_number }}</h5>
+                    <h3>Server {{ server }}:{{ data[server]['name'] }}</h3>
+                    <h5>[{{ alliance.name }}] Territory Defense Schedule for Week #{{ week_number }}</h5>
                     <table class="table table-sm text-light" id='territories'>
                         {% for territory in alliance.territories %}
                             <tr>
@@ -43,7 +90,7 @@
                         <table class="table table-sm text-light">
                             {% for territory in allyTerritories %}
                             <tr>
-                                <td>{{ territory.name }}</td>
+                                <td>[{{ territory.name }}]</td>
                                 <td class="font-weight-bold">{{ territory.territory.name }} ({{ territory.territory.level }})</td>
                                 <td class="time_format" data-time="{{ territory.territory.time }}"></td>
                                 <td>{{ territory.territory.duration }} minute duration</td>
@@ -58,24 +105,18 @@
     <hr>
     <div class="row">
         <div class="col">
-            <pre class="bg-dark text-light" id="copy_source">
-### [CTRL] Territory Defense Schedule for Week #{{ week_number }}
+            <pre class="bg-dark text-light p-3 fs-7 copy_source" id="copy_source"><code>
+### [{{ alliance.name }}] Territory Schedule for week {{ week_number }}
 {% for territory in alliance.territories %}
 * **{{ territory.name}}** ({{ territory.level }}) at &lt;t:{{ territory.time }}:F&gt; {{ territory.duration }} minute duration
 {% endfor %}
 
-### Neighbor Territory Schedule (for Territory Capture Season Pass Points ONLY)\*
+### Allies Territory Schedule
 {% for territory in allyTerritories %}
-* _{{ territory.name }}_:**{{ territory.territory.name}}** ({{ territory.territory.level }}) at &lt;t:{{ territory.territory.time }}:F&gt; {{ territory.territory.duration }} minute duration
+* _[{{ territory.name }}]_:**{{ territory.territory.name}}** ({{ territory.territory.level }}) at &lt;t:{{ territory.territory.time }}:F&gt; {{ territory.territory.duration }} minute duration
 {% endfor %}
 _All times are displayed in your local timezone_
-\* These neighbors have offered to allow us to join their territory defenses to acquire points for our Territory event
-* We have to join the Territory Capture to acquire points
-* If you do NOT need points, please do not attend
-* Please bring the smallest ships you can, preferably mining ships
-* Please keep your ships at the outer border of the territory
-* If possible please keep your ship in a quadrant that does NOT have an entry route into the system
-* If the territory becomes contested, please vacate immediately
+                    </code>
             </pre>
         </div>
     </div>

@@ -26,30 +26,30 @@ class StfcController extends AbstractController {
         ]);
     }
 
-    #[Route('/ctrl', name: 'ctrl')]
-    public function ctrl(KernelInterface $kernel): Response {
+    #[Route('/{server}/{alliance}/{week}', name: 'detail')]
+    public function detail(int $server, string $alliance, int $week, KernelInterface $kernel): Response {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
 
         /** @var Alliance[] $alliances */
-        $alliances = array_reduce($stfc_data[63]['Alliances'], function($result, $data) {
+        $alliances = array_reduce($stfc_data[$server]['Alliances'], function($result, $data) use ($week) {
             $territories = array_filter(array_map('trim', $data['Territories']));
-            $status = $data['Status'] ?? Status::ALLIANCE_STATUS_NEUTRAL;
-            $result[$data['Alliance']] = new Alliance($data['Alliance'], $status, $territories);
+            $relationships = $data['Relationships'] ?? null;
+            $result[$data['Alliance']] = Alliance::create($data['Alliance'], $relationships, $territories, $week);
             return $result;
         }, []);
-        $alliance = $alliances['CTRL'];
+        $alliance = $alliances[$alliance];
         $connectedTerritories = $alliance->getConnectedTerritories();
-        $allyAlliances = array_filter($alliances, function($alliance){ return $alliance->isAlly(); });
+        $allyAlliances = array_filter($alliances, function($searchAlliance) use ($alliance) { return $alliance->isAlly($searchAlliance->getName()); });
 
         $allyTerritories = [];
         foreach ($allyAlliances as $ally){
             foreach($ally->getTerritories() as $territory) {
-                if(in_array($territory->getName(), $connectedTerritories)) {
+                //if(in_array($territory->getName(), $connectedTerritories)) {
                     $allyTerritories[] = [
                         'name' => $ally->getName(),
                         'territory' => $territory
                     ];
-                }
+                //}
             }
         }
 
@@ -57,16 +57,17 @@ class StfcController extends AbstractController {
             return ($a['territory']->getTime() < $b['territory']->getTime()) ? -1 : 1;
         });
 
-        return $this->render('stfc/ctrl.html.twig', [
+        return $this->render('stfc/detail.html.twig', [
             'data' => $stfc_data,
             'alliance' => $alliance,
             'allies' => $allyAlliances,
             'allyTerritories' => $allyTerritories,
-            'week_number' => (new \DateTime())->format('W')
+            'week_number' => $week,
+            'server' => $server
         ]);
     }
 
-    #[Route('/api/territory/{server}/{alliance}', name: 'api_territory_redirect')]
+    #[Route('/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
     public function territoryApiRedirect(int $server, string $alliance): RedirectResponse {
         return $this->redirectToRoute('stfc_api_territory',[
             'server' => $server,
@@ -87,8 +88,8 @@ class StfcController extends AbstractController {
 
         $alliances = array_reduce($server_data['Alliances'], function($result, $data) use ($week) {
             $territories = array_filter(array_map('trim', $data['Territories']));
-            $status = $data['Status'] ?? Status::ALLIANCE_STATUS_NEUTRAL;
-            $result[$data['Alliance']] = new Alliance($data['Alliance'], $status, $territories, $week);
+            $relationships = $data['Relationships'] ?? null;
+            $result[$data['Alliance']] = Alliance::create($data['Alliance'], $relationships, $territories, $week);
             return $result;
         }, []);
 

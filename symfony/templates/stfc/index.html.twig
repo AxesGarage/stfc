@@ -2,6 +2,18 @@
 {% block title %}STFC{% endblock %}
 
 {% block javascripts %}
+    <style>
+        pre.copy_source button.copy-button {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: .65rem !important;
+        }
+
+        .fs-7 {
+            font-size: 0.8rem !important;
+        }
+    </style>
 <script>
     let data = {{ data|json_encode|raw }};
 
@@ -77,21 +89,47 @@
                     ].join('\r\n')));
                 });
                 $('#alliance_display').show();
-                $('#copy_source_container').show();
                 $('#waiting').hide();
                 $('#copy_source').text(createCopySource(response)).parent().parent().parent().show();
             });
         });
-        // const copy_button = document.getElementById('copy_button');
-        // const copy_source = document.getElementById('copy_source');
-        // copy_button.onclick = async () => {
-        //     try {
-        //         await navigator.clipboard.writeText(copy_source.textContent);
-        //         alert("Successfully copied");
-        //     } catch (e) {
-        //         alert(e);
-        //     }
-        // }
+        $('#details').on('click', function(){
+            let server = $('#server').val();
+            let alliance = $('#alliance').val();
+            let week = $('#week').val()
+            window.location = '/stfc/' + [server,alliance,week].join('/')
+        });
+
+
+        const copyButtonLabel = "Copy";
+
+        $( document ).ready(function() {
+            // use a class selector if available
+            let blocks = document.querySelectorAll("pre.copy_source");
+
+            blocks.forEach((block) => {
+                // only add button if browser supports Clipboard API
+                if (navigator.clipboard) {
+                    let button = document.createElement("button");
+
+                    button.innerText = copyButtonLabel;
+                    button.setAttribute('class', 'copy-button btn btn-sm btn-primary');
+                    button.setAttribute('title','Copy to clipboard');
+                    block.appendChild(button);
+
+                    button.addEventListener("click", async () => {
+                        await copyCode(block);
+                    });
+                }
+            });
+
+        });
+        async function copyCode(block) {
+            let code = block.querySelector("code");
+            let text = code.innerText;
+
+            await navigator.clipboard.writeText(text);
+        }
 
     });
 </script>
@@ -127,8 +165,11 @@
                 <span class="input-group-text" id="alliance_select">Alliance</span>
                 <select class="form-select" id="alliance" name="alliance" aria-describedby="alliance_select"></select>
             </div>
-            <button class="btn btn-outline-primary" id="show">Show Territory</button>
         </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col"><button class="btn btn-primary w-100" id="show">Show Territory</button></div>
+        <div class="col"><button class="btn btn-secondary w-100" id="details">Show Details</button></div>
     </div>
     <div class="row" style="display:none;">
         <div class="col">
@@ -143,31 +184,31 @@
             </div>
         </div>
     </div>
-    <div class="row" style="display:none;" id="alliance_display">
-        <div class="col">
-            <div class="card text-white bg-primary">
-                <div class="card-header text-center">
-                    <span class='alliance_name'></span> Alliance Territory
-                </div>
-                <div class="card-body bg-dark">
-                    <h3>Server <span id='server_number'></span>:<span id='server_name'></span></h3>
-                    <h5>[<span class='alliance_name'></span>] Territory Defense Schedule for Week #<span id='week_number'></span></h5>
-                    <table class="table table-sm text-light" id='territories'></table>
-                    <p class='fst-italic'>All times are displayed in your local timezone</p>
-{#                    <button class="btn btn-secondary btn-lg" id="copy_button">Copy to Clipboard</button>#}
+    <div style="display:none;" id="alliance_display">
+        <div class="row">
+            <div class="col">
+                <div class="card text-white bg-primary">
+                    <div class="card-header text-center">
+                        <span class='alliance_name'></span> Alliance Territory
+                    </div>
+                    <div class="card-body bg-dark">
+                        <h3>Server <span id='server_number'></span>:<span id='server_name'></span></h3>
+                        <h5>[<span class='alliance_name'></span>] Territory Defense Schedule for Week #<span id='week_number'></span></h5>
+                        <table class="table table-sm text-light" id='territories'></table>
+                        <p class='fst-italic'>All times are displayed in your local timezone</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row" style="display:none;" id="copy_source_container">
         <div class="row">
             <div class="col"><h3>Discord Format</h3></div>
         </div>
         <div class="row">
             <div class="col">
-                <pre class="bg-dark text-light" id="copy_source"></pre>
+                <pre class="bg-dark text-light p-3 fs-7 copy_source"><code id="copy_source"></code></pre>
             </div>
         </div>
     </div>
+
 
 {% endblock %}

@@ -7,7 +7,6 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use App\Utils\ArrayFunctions\Utils;
 use App\Utils\Stfc\Alliance;
 use App\Utils\Stfc\Territory;
 use Symfony\Component\Yaml\Yaml;
@@ -101,7 +100,7 @@ EOF
     protected static function parseTerritoryFile(array $stfcData) {
         return array_reduce($stfcData, function($result, $data){
             $territories = array_filter(array_map('trim', $data['Territories']));
-            $result[$data['Alliance']] = new Alliance($data['Alliance'], $data['Status'], $territories);
+            $result[$data['Alliance']] = Alliance::create($data['Alliance'], $data['Relationships'], $territories);
             return $result;
         }, []);
     }
