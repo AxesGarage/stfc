@@ -26,56 +26,7 @@ class StfcController extends AbstractController {
         ]);
     }
 
-//    #[Route('/stfc/ctrl', name: 'app_stfc_ctrl')]
-//    public function ctrl(KernelInterface $kernel): Response {
-//        $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
-//
-//        /** @var Alliance[] $alliances */
-//        $alliances = array_reduce($stfc_data[63]['Alliances'], function($result, $data) {
-//            $territories = array_filter(array_map('trim', $data['Territories']));
-//            $status = $data['Status'] ?? Status::ALLIANCE_STATUS_NEUTRAL;
-//            $result[$data['Alliance']] = new Alliance($data['Alliance'], $status, $territories);
-//            return $result;
-//        }, []);
-//        $alliance = $alliances['MAPL'];
-//        $connectedTerritories = $alliance->getConnectedTerritories();
-//        $allyAlliances = array_filter($alliances, function($alliance){ return $alliance->isAlly(); });
-//
-//        $allyTerritories = [];
-//        foreach ($allyAlliances as $ally){
-//            foreach($ally->getTerritories() as $territory) {
-//                if(in_array($territory->getName(), $connectedTerritories)) {
-//                    $allyTerritories[] = [
-//                        'name' => $ally->getName(),
-//                        'territory' => $territory
-//                    ];
-//                }
-//            }
-//        }
-//
-//        uasort($allyTerritories, function ($a, $b) {
-//            return ($a['territory']->getTime() < $b['territory']->getTime()) ? -1 : 1;
-//        });
-//
-//        dump([
-//            'data' => $stfc_data,
-//            'alliance' => $alliance,
-//            'connectedTerritories' => $connectedTerritories,
-//            'allies' => $allyAlliances,
-//            'allyTerritories' => $allyTerritories,
-//            'week_number' => (new \DateTime())->format('W')
-//        ]);
-//
-//        return $this->render('stfc/ctrl.html.twig', [
-//            'data' => $stfc_data,
-//            'alliance' => $alliance,
-//            'allies' => $allyAlliances,
-//            'allyTerritories' => $allyTerritories,
-//            'week_number' => (new \DateTime())->format('W')
-//        ]);
-//    }
-
-    #[Route('/stfc/{server}/{alliance}/{week}', name: 'detail')]
+    #[Route('/{server}/{alliance}/{week}', name: 'detail')]
     public function detail(int $server, string $alliance, int $week, KernelInterface $kernel): Response {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
 
@@ -116,7 +67,7 @@ class StfcController extends AbstractController {
         ]);
     }
 
-    #[Route('/stfc/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
+    #[Route('/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
     public function territoryApiRedirect(int $server, string $alliance): RedirectResponse {
         return $this->redirectToRoute('stfc_api_territory',[
             'server' => $server,
