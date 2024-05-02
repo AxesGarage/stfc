@@ -101,7 +101,7 @@ EOF
     protected static function parseTerritoryFile(array $stfcData) {
         return array_reduce($stfcData, function($result, $data){
             $territories = array_filter(array_map('trim', $data['Territories']));
-            $result[$data['Alliance']] = new Alliance($data['Alliance'], $data['Status'], $territories);
+            $result[$data['Alliance']] = Alliance::create($data['Alliance'], $data['Relationships'], $territories);
             return $result;
         }, []);
     }
