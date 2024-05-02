@@ -1,4 +1,4 @@
-FROM php:8.2-bookworm AS Builder
+FROM php:8.2-fpm-bookworm AS Builder
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
     git \
@@ -34,6 +34,7 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash && mv /root/.symfony5/
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 ENV COMPOSER_MEMORY_LIMIT=-1
 ENV COMPOSER_CACHE_DIR=/tmp
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY symfony /var/www/symfony
 

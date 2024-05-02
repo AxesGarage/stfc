@@ -14,9 +14,10 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Yaml\Yaml;
 
+#[Route(path: '/stfc', name: 'stfc_')]
 class StfcController extends AbstractController {
 
-    #[Route('/stfc/', name: 'app_stfc_index')]
+    #[Route('/', name: 'index')]
     public function index(KernelInterface $kernel): Response {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
         return $this->render('stfc/index.html.twig', [
@@ -74,7 +75,7 @@ class StfcController extends AbstractController {
 //        ]);
 //    }
 
-    #[Route('/stfc/{server}/{alliance}/{week}', name: 'app_stfc_detail')]
+    #[Route('/stfc/{server}/{alliance}/{week}', name: 'detail')]
     public function detail(int $server, string $alliance, int $week, KernelInterface $kernel): Response {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
 
@@ -117,14 +118,14 @@ class StfcController extends AbstractController {
 
     #[Route('/stfc/api/territory/{server}/{alliance}', name: 'app_territory_api_redirect')]
     public function territoryApiRedirect(int $server, string $alliance): RedirectResponse {
-        return $this->redirectToRoute('app_territory_api',[
+        return $this->redirectToRoute('stfc_api_territory',[
             'server' => $server,
             'alliance' => $alliance,
             'week' => (new \DateTime())->format('W')
         ]);
     }
 
-    #[Route('/stfc/api/territory/{server}/{alliance}/{week}', name: 'app_territory_api')]
+    #[Route('/api/territory/{server}/{alliance}/{week}', name: 'api_territory')]
     public function territoryApi(int $server, string $alliance, int $week, KernelInterface $kernel): JsonResponse {
         $stfc_data = Yaml::parseFile($kernel->getProjectDir() . '/data/stfc.yaml');
 
