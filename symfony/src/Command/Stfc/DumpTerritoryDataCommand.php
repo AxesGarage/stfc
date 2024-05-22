@@ -18,6 +18,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class DumpTerritoryDataCommand extends BaseCommand {
 
+    /**
+     * @return void
+     */
     protected function configure() {
         $this
             ->addArgument('format', InputArgument::OPTIONAL, 'Output format (csv or json)', 'csv')
